@@ -1,0 +1,13 @@
+.idea/
+backup/
+*.txt
+jpeg
+.DS_Store
+test/
+src/__pycache__
+out
+src/pyevs/__pycache__
+dist/specs/
+src/build/
+dist
+src/*.spec

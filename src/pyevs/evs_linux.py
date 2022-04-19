@@ -45,12 +45,14 @@ base_url = "wss://ivs.iflyos.cn/embedded/v1"
 # Implicit_authorization Information
 access_token = ''
 device_id = ''
+shell_dir_path = ''
 
 print(os.getcwd() )
 
 # Implicit_authorization file
-authorization_file = './src/shell/implicit_authorization.sh'
-access_token_file = './src/shell/access_token.json'
+authorization_file = 'implicit_authorization.sh'
+access_token_file = 'access_token.json'
+shell_control_center_file = 'shell_control_center.sh'
 
 # recordAudio file
 #audio_file_path = "./wav.fifo"
@@ -80,14 +82,28 @@ def yprint(text):
 def bprint(text):
     print('\033[1;34m%s\033[0m' % text)
 
+def init_resource():
+    global shell_dir_path
+    global authorization_file, access_token_file, shell_control_center_file
 
+    if getattr(sys, 'frozen', False): #是否Bundle Resource
+        base_path = sys._MEIPASS
+        shell_dir_path = os.path.join(base_path, 'shell')
+    else:
+        base_path = os.path.abspath(".")
+        shell_dir_path = os.path.join(base_path, os.path.join('src', 'shell'))
+
+    authorization_file = os.path.join(shell_dir_path, authorization_file)
+    access_token_file = os.path.join(shell_dir_path, access_token_file)
+    shell_control_center_file = os.path.join(shell_dir_path, shell_control_center_file)
+     
 def volume_control(action, volume=10):
     if action == 'set':
-        os.system('./src/shell/shell_control_center.sh -v -s %d' % (volume))
+        os.system(f'{shell_control_center_file} -v -s {volume}' )
     elif action == 'get':
-        return os.popen('./src/shell/shell_control_center.sh -v -g', 'r').read()
+        return os.popen(f'{shell_control_center_file} -v -g', 'r').read()
     elif action == 'up' or action == 'down':
-        os.system('./src/shell/shell_control_center.sh -v -%s' % action[0])
+        os.system( '{} -v -{}'.format(shell_control_center_file, action[0]) )
 
 
 def excuteCommand(com):
@@ -101,29 +117,29 @@ def excuteCommand(com):
 
 def playback_play_tts(url):
     print("playback_play:" + url)
-    excuteCommand('./src/shell/shell_control_center.sh -p -b %s' % url)
+    excuteCommand('{} -p -b {}'.format(shell_control_center_file, url) )
     print('playback_play end!')
 
 
 def playback_play(url, wait=False):
     print("playback_play:" + url)
     if wait:
-        excuteCommand('./src/shell/shell_control_center.sh -p -b %s' % url)
+        excuteCommand('{} -p -b {}'.format( shell_control_center_file,  url) )
     else:
-        os.system('./src/shell/shell_control_center.sh -p -b %s' % url)
+        os.system('{} -p -b {}'.format( shell_control_center_file,  url) )
     print('playback_play end!')
 
 
 def playback_pause():
-    os.system('./src/shell/shell_control_center.sh -p -p')
+    os.system(f'{shell_control_center_file} -p -p')
 
 
 def playback_stop():
-    os.system('./src/shell/shell_control_center.sh -p -s')
+    os.system(f'{shell_control_center_file} -p -s')
 
 
 def playback_resume():
-    os.system('./src/shell/shell_control_center.sh -p -r')
+    os.system(f'{shell_control_center_file} -p -r')
 
 
 def record_start():
@@ -1427,6 +1443,7 @@ def init():
 def evs_app_init():
     # init
     init()
+    init_resource()
     authorization()
     createAgent()
     # open_record_devce()
@@ -1453,6 +1470,7 @@ def main():
 
     # init
     init()
+    init_resource()
     authorization()
     createAgent()
     open_record_devce()

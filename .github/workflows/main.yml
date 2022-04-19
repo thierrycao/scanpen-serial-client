@@ -8,11 +8,11 @@ name: Python application
 
 on:
   push:
-    branches: [ master, feature/deploy-test ]
+    branches: [ master, main, feature/deploy-test ]
     tags:
       - 'v*'
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 jobs:
   build:
     name: Build Source Lint Static and Pack Dist

@@ -23,6 +23,14 @@ jobs:
     #runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - name: Install portaudio (Linux)
+      if: success() && ( runner.os == 'Linux')
+      run: |
+        sudo apt-get install -y portaudio19-dev python-all-dev python3-all-dev
+    - name: Install portaudio (macOS)
+      if: success() && ( runner.os == 'macOS')
+      run: |
+        brew install portaudio
     - name: Set up Python 3.8
       uses: actions/setup-python@v2
       with:
@@ -31,8 +39,9 @@ jobs:
       if: success() && ( runner.os == 'Linux' || runner.os == 'macOS' )
       run: |
         python -m pip install --upgrade pip
+        
         pip install flake8 pytest
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        pip install -r requirements.txt
         pip install https://github.com/pyinstaller/pyinstaller/archive/develop.tar.gz
         echo "RUNNER_OS:"${{ runner.os }}
     - name: Install dependencies (Windows)

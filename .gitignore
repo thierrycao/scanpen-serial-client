@@ -1,6 +1,7 @@
 .idea/
 backup/
 *.txt
+!requirements.txt
 jpeg
 .DS_Store
 test/
